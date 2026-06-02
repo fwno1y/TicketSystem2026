@@ -19,6 +19,12 @@ struct Date {
     bool operator<(const Date& other) const;
     bool operator==(const Date& other) const;
     bool operator<=(const Date& other) const;
+    bool operator>(const Date& other) const;
+    bool operator>=(const Date& other) const;
+    bool operator!=(const Date& other) const;
+
+    friend std::istream& operator>>(std::istream& is, Date& date);
+    friend std::ostream& operator<<(std::ostream& os, const Date& date);
 };
 
 struct Time {
@@ -33,6 +39,9 @@ struct Time {
     int to_minutes() const;
     bool operator<(const Time& other) const;
     bool operator==(const Time& other) const;
+
+    friend std::istream& operator>>(std::istream& is, Time& time);
+    friend std::ostream& operator<<(std::ostream& os, const Time& time);
 };
 
 struct DateTime {
@@ -43,7 +52,7 @@ struct DateTime {
     DateTime(const Date& d, const Time& t);
 
     int to_minutes() const;
-    static DateTime to_datetime(int minutes);
+    static DateTime from_minutes(int minutes);
     DateTime add_minutes(int minutes) const;
     int diff(const DateTime& other) const;
 
@@ -51,6 +60,9 @@ struct DateTime {
     bool operator==(const DateTime& other) const;
     bool operator<=(const DateTime& other) const;
     std::string to_string() const;
+
+    friend std::istream& operator>>(std::istream& is, DateTime& dt);
+    friend std::ostream& operator<<(std::ostream& os, const DateTime& dt);
 };
 
 #endif //TICKETSYSTEM_DATE_H
