@@ -19,7 +19,7 @@ struct Command {
 class CommandParser {
 public:
     bool parse(const std::string& line, Command& cmd);
-    void split(const std::string& str, char d, sjtu::vector<std::string>& res);
+    void split(const std::string& str, sjtu::vector<std::string>& res);
 };
 
 #endif //TICKETSYSTEM_PARSER_H
