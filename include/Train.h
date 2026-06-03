@@ -12,10 +12,10 @@ public:
     int stationNum = 0;
     int seatNum = 0;
     char stations[MAX_STATION][31]{};
-    int prices[MAX_STATION]{};
+    int prices[MAX_STATION]{}; //前缀和存储
     Time startTime;
-    int travelTimes[MAX_STATION]{};
-    int stopoverTimes[MAX_STATION]{};
+    int arriveTimes[MAX_STATION]{}; //每个站到达时间
+    int leaveTimes[MAX_STATION]{}; //每个站出发时间
     Date saleDateStart;
     Date saleDateEnd;
     char type{};
@@ -29,8 +29,8 @@ public:
         const std::string& y);
 
     int find_station(const char* n) const;
-    DateTime get_arrive_time(int idx, const Date& start) const;
-    DateTime get_leave_time(int idx, const Date& start) const;
+    DateTime get_arrive_time(int idx, const Date& start_date) const;
+    DateTime get_leave_time(int idx, const Date& start_date) const;
     int get_price(int from, int to) const;
 };
 
@@ -83,7 +83,7 @@ struct Ticket {
     DateTime arrive_time;
     int price = 0;
     int seat = 0;
-    char type = 0;
+    int duration = 0;
 
     Ticket() = default;
     bool less_by_time(const Ticket& other) const;

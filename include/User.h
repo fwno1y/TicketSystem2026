@@ -13,7 +13,7 @@ public:
 
 
     User() = default;
-    User(const std::string& u, const std::string& p, const std::string& n, const std::string& m, int c);
+    User(const std::string& u, const std::string& p, const std::string& n, const std::string& m, int g);
     ~User();
 
 };

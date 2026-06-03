@@ -32,7 +32,7 @@ int Command::get_int(char key) const {
 bool CommandParser::parse(const std::string &line, Command &cmd) {
     cmd = Command();
     sjtu::vector<std::string> tokens;
-    split(line, tokens);
+    split(line,' ', tokens);
     const std::string& str = tokens[0];
     if (str.size() < 3 || str[0] != '[' || str[str.size() - 1] != ']') {
         return false;
@@ -57,10 +57,10 @@ bool CommandParser::parse(const std::string &line, Command &cmd) {
     return true;
 }
 
-void CommandParser::split(const std::string &str, sjtu::vector<std::string> &res) {
+void CommandParser::split(const std::string &str, char delimiter, sjtu::vector<std::string> &res) {
     std::string cur;
     for (int i = 0; i < str.size(); ++i) {
-        if (str[i] == ' ') {
+        if (str[i] == delimiter) {
             if (!cur.empty()) {
                 res.push_back(cur);
                 cur.clear();
