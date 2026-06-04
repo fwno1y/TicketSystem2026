@@ -21,8 +21,8 @@ public:
     int add_user(const std::string& c, const std::string& u, const std::string& p,const std::string& n, const std::string& m, const std::string& g);
     int login(const std::string& u, const std::string& p);
     int logout(const std::string& u);
-    bool query_profile(const std::string& c, const std::string& u);
-    bool modify_profile(const std::string& c, const std::string& u, const std::string& p, const std::string& n, const std::string& m, const std::string& g);
+    int query_profile(const std::string& c, const std::string& u);
+    int modify_profile(const std::string& c, const std::string& u, const std::string& p, const std::string& n, const std::string& m, const std::string& g);
     void clean();
 
     bool is_logged(const std::string& u) const;

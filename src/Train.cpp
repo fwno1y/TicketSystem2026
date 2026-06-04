@@ -67,7 +67,9 @@ int Train::get_price(int from, int to) const {
     return prices[to] - prices[from];
 }
 
-TrainKey::TrainKey() = default;
+TrainKey::TrainKey() {
+    memset(trainID, 0, sizeof(trainID));
+}
 
 TrainKey::TrainKey(const std::string &str) {
     std::strcpy(trainID, str.c_str());
@@ -81,7 +83,9 @@ bool TrainKey::operator==(const TrainKey &other) const {
     return strcmp(trainID, other.trainID) == 0;
 }
 
-DayKey::DayKey() = default;
+DayKey::DayKey() {
+    memset(trainID, 0, sizeof(trainID));
+}
 
 DayKey::DayKey(const std::string& str, const Date& d) : date(d) {
     std::strcpy(trainID, str.c_str());
@@ -99,7 +103,10 @@ DayKey::operator==(const DayKey &other) const {
     return std::strcmp(trainID,other.trainID) == 0 && date = other.date;
 }
 
-StationKey::StationKey() = default;
+StationKey::StationKey() {
+    memset(stationName, 0, sizeof(stationName));
+    memset(trainID, 0, sizeof(trainID));
+}
 
 StationKey::StationKey(const std::string &str, const std::string &id) {
     std::strcpy(stationName, str.c_str());
@@ -116,6 +123,12 @@ bool StationKey::operator<(const StationKey &other) const {
 
 bool StationKey::operator==(const StationKey &other) const {
     return strcmp(stationName, other.stationName) == 0 && strcmp(trainID, other.trainID) == 0;
+}
+
+Station::Station(const std::string& id, int idx) {
+    memset(trainID, 0, sizeof(trainID));
+    std::strcpy(trainID, id.c_str());
+    station_idx = idx;
 }
 
 TicketLeft::TicketLeft(int seat, int station) {

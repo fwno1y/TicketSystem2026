@@ -45,7 +45,7 @@ public:
 
     void insert(const Key& key, const Value& value);
     bool remove(const Key& key, const Value& value);
-    void find(const Key& key, sjtu::vector<Value>& res);
+    bool find(const Key& key, Value& res);
     bool find_range(const Key& low, const Key& high,sjtu::vector<Value>& res);
     void clear();
     bool empty();

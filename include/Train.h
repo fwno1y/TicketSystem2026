@@ -61,9 +61,10 @@ struct StationKey {
 };
 
 struct Station {
+    char trainID[21]{};
     int station_idx = 0;
     Station() = default;
-    Station(int idx);
+    Station(const std::string& id, int idx);
 };
 
 struct TicketLeft {

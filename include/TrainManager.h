@@ -24,11 +24,10 @@ public:
         const std::string& x, const std::string& t, const std::string& o, const std::string& d, const std::string& y);
     int delete_train(const std::string& i);
     int release_train(const std::string& i);
-    int query_train(const std::string& i, const std::string& d);
-    int query_ticket_time(const std::string& s, const std::string& t, const std::string& d);
-    int query_ticket_cost(const std::string& s, const std::string& t, const std::string& d);
-    bool query_transfer_time(const std::string& s, const std::string& t, const std::string& d);
-    bool query_transfer_cost(const std::string& s, const std::string& t, const std::string& d);
+    int query_train(const std::string& i, const std::string& d, std::ostream& out);
+    int query_ticket(const std::string& s, const std::string& t, const std::string& d, bool p, sjtu::vector<Ticket>& res);
+    bool query_transfer(const std::string& s, const std::string& t, const std::string& d, bool p, Ticket& t1, Ticket& t2);
+
     void clean();
     //辅助函数
     bool get_train(const std::string& id, Train& train);

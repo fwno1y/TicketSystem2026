@@ -12,9 +12,9 @@ enum OrderStatus {
 
 class Order {
 public:
-    int orderID;  //订单号
-    int timestamp; //下单时间
-    OrderStatus status_;
+    int orderID = 0;  //订单号
+    int timestamp = 0; //下单时间
+    OrderStatus status;
     char username[21]{};
     char trainID[21]{};
     Date start_date; //始发站时间
@@ -33,7 +33,7 @@ public:
 
 struct OrderKey {
     char username[21];
-    int orderID;
+    int orderID = 0;
 
     OrderKey();
     OrderKey(const std::string& str, int id);
@@ -59,7 +59,7 @@ struct PendingOrderKey {
     int orderID = 0;
 
     PendingOrderKey() = default;
-    PendingOrderKey(const char* id, const Date& d, int orderid);
+    PendingOrderKey(const std::string& id, const Date& d, int orderid);
     bool operator<(const PendingOrderKey& other) const;
     bool operator==(const PendingOrderKey& other) const;
 

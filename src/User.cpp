@@ -11,9 +11,12 @@ User::User(const std::string &u, const std::string &p, const std::string &n, con
 
 User::~User() = default;
 
-UserKey::UserKey() = default;
+UserKey::UserKey() {
+    memset(username, 0, sizeof(username));
+}
 
 UserKey::UserKey(const std::string &str) {
+    memset(username, 0, sizeof(username));
     std::strcpy(username, str.c_str());
 }
 
