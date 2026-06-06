@@ -1,5 +1,6 @@
 #include "../include/Order.h"
-#include<cstring>
+#include <cstring>
+
 Order::print() const {
     if (status == SUCCESS) {
         std::cout << "[success] ";

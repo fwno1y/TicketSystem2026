@@ -136,13 +136,7 @@ int OrderManager::refund_ticket(const std::string &u, int n, TrainManager &train
     }
     else if (order.status == OrderStatus::PENDING) {
         PendingOrderKey pkey(order.trainID, order.start_date, order.orderID);
-        PendingOrder po;
-        po.order_pos = target_pos;
-        po.orderID = order.orderID;
-        po.from_idx = order.from_idx;
-        po.to_idx = order.to_idx;
-        po.num = order.num;
-        pending_index.remove(pkey, po);
+        pending_index.remove(pkey);
         order.status = OrderStatus::REFUNDED;
         order_data.update(order, target_pos);
     }
@@ -182,7 +176,7 @@ void OrderManager::process_pending(const std::string &trainID, const Date &date,
             order.status = OrderStatus::SUCCESS;
             order_data.update(order, po.order_pos);
             PendingOrderKey pkey(trainID, date, po.orderID);
-            pending_index.remove(pkey, po);
+            pending_index.remove(pkey);
         }
     }
     if (updated) {

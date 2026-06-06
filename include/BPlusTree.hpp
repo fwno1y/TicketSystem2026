@@ -44,9 +44,9 @@ public:
     ~BPlusTree();
 
     void insert(const Key& key, const Value& value);
-    bool remove(const Key& key, const Value& value);
+    bool remove(const Key& key);
     bool find(const Key& key, Value& res);
-    bool find_range(const Key& low, const Key& high,sjtu::vector<Value>& res);
+    void find_range(const Key& low, const Key& high,sjtu::vector<Value>& res);
     void clear();
     bool empty();
 };

@@ -388,7 +388,9 @@ bool BPlusTree<Key, Value, M>::find(const Key& key, Value& result) {
 
 template<typename Key, typename Value, int M>
 void BPlusTree<Key, Value, M>::find_range(const Key& low, const Key& high, sjtu::vector<Value>& result) {
-    if (root == 0) return;
+    if (root == 0) {
+        return;
+    }
 
     int cur = root;
     Node node;

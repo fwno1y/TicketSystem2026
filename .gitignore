@@ -1,0 +1,23 @@
+# 编译生成的目标文件夹
+build/
+
+# 本地数据文件（如果你运行程序生成的临时数据库文件不需要提交）
+order_data
+order_index
+pending_index
+train_data
+train_date_index
+train_station_index
+ticket_data
+user_data
+user_index
+
+# 编译产生的可执行文件
+code
+code.exe
+
+# 各种编辑器的配置文件缓存
+.vscode/
+.idea/
+*.swp
+*.o
