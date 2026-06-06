@@ -46,7 +46,7 @@ Train::Train(const std::string &i, const std::string &n, const std::string &m, c
 
 int Train::find_station(const std::string& n) const {
     for (int i = 0; i < stationNum; ++i) {
-        if (std::strcmp(stations[i], n) == 0) {
+        if (std::strcmp(stations[i], n.c_str()) == 0) {
             return i;
         }
     }
@@ -91,7 +91,7 @@ DayKey::DayKey(const std::string& str, const Date& d) : date(d) {
     std::strcpy(trainID, str.c_str());
 }
 
-DayKey::operator<(const DayKey &other) const {
+bool DayKey::operator<(const DayKey &other) const {
     int cmp = std::strcmp(trainID, other.trainID);
     if (cmp != 0) {
         return cmp < 0;
@@ -99,8 +99,8 @@ DayKey::operator<(const DayKey &other) const {
     return date < other.date;
 }
 
-DayKey::operator==(const DayKey &other) const {
-    return std::strcmp(trainID,other.trainID) == 0 && date = other.date;
+bool DayKey::operator==(const DayKey &other) const {
+    return std::strcmp(trainID,other.trainID) == 0 && date == other.date;
 }
 
 StationKey::StationKey() {
@@ -118,7 +118,7 @@ bool StationKey::operator<(const StationKey &other) const {
     if (cmp != 0) {
         return cmp < 0;
     }
-    return std::strcpy(trainID, other.trainID) < 0;
+    return std::strcmp(trainID, other.trainID) < 0;
 }
 
 bool StationKey::operator==(const StationKey &other) const {
@@ -129,6 +129,18 @@ Station::Station(const std::string& id, int idx) {
     memset(trainID, 0, sizeof(trainID));
     std::strcpy(trainID, id.c_str());
     station_idx = idx;
+}
+
+bool Station::operator<(const Station &other) const {
+    int cmp = std::strcmp(trainID, other.trainID);
+    if (cmp != 0) {
+        return cmp < 0;
+    }
+    return station_idx < other.station_idx;
+}
+
+bool Station::operator==(const Station &other) const {
+    return std::strcmp(trainID, other.trainID) == 0 && station_idx == other.station_idx;
 }
 
 TicketLeft::TicketLeft(int seat, int station) {

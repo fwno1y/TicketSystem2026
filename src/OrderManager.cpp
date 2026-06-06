@@ -41,13 +41,13 @@ int OrderManager::buy_ticket(const std::string &u, const std::string &i, const s
         Order order;
         order.orderID = order_cnt;
         order.timestamp = timestamp;
-        order.status == OrderStatus::SUCCESS;
+        order.status = OrderStatus::SUCCESS;
         std::strncpy(order.username, u.c_str(), 20);
         std::strncpy(order.trainID, i.c_str(), 20);
         order.start_date = start_date;
         order.user_date = user_date;
         std::strncpy(order.from_station, f.c_str(), 30);
-        std::strncpy(order.to_station, i.c_str(), 30);
+        std::strncpy(order.to_station, t.c_str(), 30);
         order.from_idx = from_idx;
         order.to_idx = to_idx;
         order.leave_time = train.get_leave_time(from_idx, start_date);
@@ -68,7 +68,7 @@ int OrderManager::buy_ticket(const std::string &u, const std::string &i, const s
         Order order;
         order.orderID = order_cnt;
         order.timestamp = timestamp;
-        order.status == OrderStatus::PENDING;
+        order.status = OrderStatus::PENDING;
         std::strncpy(order.username, u.c_str(), 20);
         std::strncpy(order.trainID, i.c_str(), 20);
         order.start_date = start_date;

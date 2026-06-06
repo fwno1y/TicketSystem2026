@@ -1,7 +1,7 @@
 #include "../include/Order.h"
 #include <cstring>
 
-Order::print() const {
+void Order::print() const {
     if (status == SUCCESS) {
         std::cout << "[success] ";
     }
@@ -46,6 +46,22 @@ bool OrderKey::operator>(const OrderKey &other) const {
 
 bool OrderKey::operator>=(const OrderKey &other) const {
     return !(*this < other);
+}
+
+bool PendingOrder::operator<(const PendingOrder &other) const {
+    if (orderID != other.orderID) {
+        return orderID < other.orderID;
+    }
+    return order_pos < other.order_pos;
+}
+
+bool PendingOrder::operator==(const PendingOrder &other) const {
+    return order_pos == other.order_pos && orderID == other.orderID && from_idx == other.from_idx && to_idx == other.to_idx &&  num == other.num;
+}
+
+PendingOrderKey::PendingOrderKey() {
+    memset(trainID, 0, sizeof(trainID));
+    orderID = 0;
 }
 
 PendingOrderKey::PendingOrderKey(const std::string& id, const Date &d, int orderid) : date(d), orderID(orderid) {

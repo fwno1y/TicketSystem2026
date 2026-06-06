@@ -65,6 +65,8 @@ struct Station {
     int station_idx = 0;
     Station() = default;
     Station(const std::string& id, int idx);
+    bool operator<(const Station& other) const;
+    bool operator==(const Station& other) const;
 };
 
 struct TicketLeft {

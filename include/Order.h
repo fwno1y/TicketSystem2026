@@ -56,6 +56,8 @@ struct PendingOrder {
     int num = 0;
 
     PendingOrder() = default;
+    bool operator<(const PendingOrder& other) const;
+    bool operator==(const PendingOrder& other) const;
 };
 
 struct PendingOrderKey {

@@ -4,6 +4,9 @@
 #include "../include/MemoryRiver.h"
 #include "../include/Vector.h"
 #include "../include/BPlusTree.hpp"
+#include "../include/UserManager.h"
+#include "../include/TrainManager.h"
+#include "../include/OrderManager.h"
 #include <cstring>
 #include <string>
 
@@ -429,4 +432,10 @@ bool BPlusTree<Key, Value, M>::empty() {
     return root == 0;
 }
 
+template class BPlusTree<OrderKey, int, 100>;
+template class BPlusTree<PendingOrderKey, PendingOrder, 100>;
+template class BPlusTree<TrainKey, int, 100>;
+template class BPlusTree<DayKey, int, 100>;
+template class BPlusTree<StationKey, Station, 100>;
+template class BPlusTree<UserKey, int, 100>;
 #endif //TICKETSYSTEM_BPLUSTREE_HPP
