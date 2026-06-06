@@ -56,19 +56,70 @@ int main() {
             train_manager.query_train(cmd.get('i'), cmd.get('d'));
         }
         else if (cmd.cmd == "query_ticket") {
-
+            bool p_time = false;
+            if (cmd.get('p') == "time") {
+                p_time = true;
+            }
+            sjtu::vector<Ticket> res;
+            std::cout << train_manager.query_ticket(cmd.get('s'),cmd.get('t'), cmd.get('d'), p_time, res);
+            for (int i = 0; i < res.size(); ++i) {
+                const Ticket& ticket = res[i];
+                std::cout << ticket.trainID << " " << ticket.from_station << " " << ticket.leave_time.to_string() << " -> " << ticket.to_station << " " << ticket.arrive_time.to_string() << " " << ticket.price << " " << ticket.seat << '\n';
+            }
         }
         else if (cmd.cmd == "query_transfer") {
-
+            bool p_time = false;
+            if (cmd.get('p') == "time") {
+                p_time = true;
+            }
+            Ticket t1, t2;
+            bool found = train_manager.query_transfer(cmd.get('s'), cmd.get('t'), cmd.get('d'), p_time, t1, t2);
+            if (!found) {
+                std::cout << 0 << '\n';
+            }
+            else {
+                std::cout << t1.trainID << " " << t1.from_station << " " << t1.leave_time.to_string() << " -> " << t1.to_station << " " << t1.arrive_time.to_string() << " " << t1.price << " " << t1.seat << '\n';
+                std::cout << t2.trainID << " " << t2.from_station << " " << t2.leave_time.to_string() << " -> " << t2.to_station << " " << t2.arrive_time.to_string() << " " << t2.price << " " << t2.seat << '\n';
+            }
         }
         else if (cmd.cmd == "buy_ticket") {
-
+            if (!user_manager.is_logged(cmd.get('u'))) {
+                std::cout << -1 << '\n';
+            }
+            else {
+                bool q = false;
+                if (cmd.has('q') && cmd.get('q') == "true") {
+                    q = true;
+                }
+                int res = order_manager.buy_ticket(cmd.get('u'), cmd.get('i'), cmd.get('d'), cmd.get('n'), cmd.get('f'), cmd.get('t'), q, cmd.timestamp, train_manager);
+                if (res == -2) {
+                    std::cout << "queue" << '\n';
+                }
+                else {
+                    std::cout << res << '\n';
+                }
+            }
         }
         else if (cmd.cmd == "query_order") {
-
+            if (!user_manager.is_logged(cmd.get('u'))) {
+                std::cout << -1 << '\n';
+            }
+            else {
+                sjtu::vector<Order> res;
+                order_manager.query_order(cmd.get('u'), res);
+            }
         }
         else if (cmd.cmd == "refund_ticket") {
-
+            if (!user_manager.is_logged(cmd.get('u'))) {
+                std::cout << -1 << '\n';
+            }
+            else {
+                int n = 1;
+                if (cmd.has('n')) {
+                    n = cmd.get_int('n');
+                }
+                std::cout << order_manager.refund_ticket(cmd.get('u'), n, train_manager) << '\n';
+            }
         }
         else if (cmd.cmd == "clean") {
             user_manager.clean();
