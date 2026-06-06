@@ -29,6 +29,8 @@ public:
     int num = 0;
 
     Order() = default;
+
+    void print() const;
 };
 
 struct OrderKey {
@@ -40,6 +42,9 @@ struct OrderKey {
 
     bool operator<(const OrderKey& other) const;
     bool operator==(const OrderKey& other) const;
+    bool operator<=(const OrderKey& other) const;
+    bool operator>(const OrderKey& other) const;
+    bool operator>=(const OrderKey& other) const;
 };
 
 //候补订单
@@ -58,10 +63,13 @@ struct PendingOrderKey {
     Date date;
     int orderID = 0;
 
-    PendingOrderKey() = default;
+    PendingOrderKey();
     PendingOrderKey(const std::string& id, const Date& d, int orderid);
     bool operator<(const PendingOrderKey& other) const;
     bool operator==(const PendingOrderKey& other) const;
+    bool operator<=(const PendingOrderKey& other) const;
+    bool operator>(const PendingOrderKey& other) const;
+    bool operator>=(const PendingOrderKey& other) const;
 
 };
 

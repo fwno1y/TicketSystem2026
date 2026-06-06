@@ -1,6 +1,17 @@
 #include "../include/Order.h"
 #include<cstring>
-
+Order::print() const {
+    if (status == SUCCESS) {
+        std::cout << "[success] ";
+    }
+    else if (status == PENDING) {
+        std::cout << "[pending] ";
+    }
+    else {
+        std::cout << "[refunded] ";
+    }
+    std::cout << trainID << " " << from_station << " " << leave_time.to_string() << " -> " << to_station << " " << arrive_time.to_string() << " " << price << " " << num;
+}
 OrderKey::OrderKey() {
     memset(username, 0, sizeof(username));
     orderID = 0;
@@ -24,6 +35,17 @@ bool OrderKey::operator==(const OrderKey &other) const {
     return std::strcmp(username, other.username) == 0 && orderID == other.orderID;
 }
 
+bool OrderKey::operator<=(const OrderKey &other) const {
+    return *this < other || *this == other;
+}
+
+bool OrderKey::operator>(const OrderKey &other) const {
+    return !(*this <= other);
+}
+
+bool OrderKey::operator>=(const OrderKey &other) const {
+    return !(*this < other);
+}
 
 PendingOrderKey::PendingOrderKey(const std::string& id, const Date &d, int orderid) : date(d), orderID(orderid) {
     std::strcpy(trainID, id.c_str());
@@ -44,5 +66,15 @@ bool PendingOrderKey::operator==(const PendingOrderKey &other) const {
     return std::strcmp(trainID, other.trainID) == 0 && date == other.date && orderID == other.orderID;
 }
 
+bool PendingOrderKey::operator<=(const PendingOrderKey &other) const {
+    return *this == other || *this < other;
+}
 
+bool PendingOrderKey::operator>(const PendingOrderKey &other) const {
+    return !(*this <= other);
+}
+
+bool PendingOrderKey::operator>=(const PendingOrderKey &other) const {
+    return !(*this < other);
+}
 
