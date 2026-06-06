@@ -24,12 +24,14 @@ public:
         const std::string& x, const std::string& t, const std::string& o, const std::string& d, const std::string& y);
     int delete_train(const std::string& i);
     int release_train(const std::string& i);
-    int query_train(const std::string& i, const std::string& d, std::ostream& out);
+    int query_train(const std::string& i, const std::string& d);
     int query_ticket(const std::string& s, const std::string& t, const std::string& d, bool p, sjtu::vector<Ticket>& res);
     bool query_transfer(const std::string& s, const std::string& t, const std::string& d, bool p, Ticket& t1, Ticket& t2);
 
     void clean();
     //辅助函数
+    bool compare_ticket(const Ticket& a, const Ticket& b, bool p_time);
+    void sort_tickets(sjtu::vector<Ticket>& res, int low, int high, bool p_time);
     bool get_train(const std::string& id, Train& train);
     // 检查并预扣票（用于购票流程）
     // 返回值：成功返回票价；座位不足返回 0；车次/日期/站点无效返回 -1

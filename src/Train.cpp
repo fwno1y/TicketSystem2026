@@ -44,7 +44,7 @@ Train::Train(const std::string &i, const std::string &n, const std::string &m, c
     saleDateEnd.parse(date_list[1]);
 }
 
-int Train::find_station(const char *n) const {
+int Train::find_station(const std::string& n) const {
     for (int i = 0; i < stationNum; ++i) {
         if (std::strcmp(stations[i], n) == 0) {
             return i;

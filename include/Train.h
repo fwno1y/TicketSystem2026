@@ -28,7 +28,7 @@ public:
         const std::string& t, const std::string& o, const std::string& d,
         const std::string& y);
 
-    int find_station(const char* n) const;
+    int find_station(const std::string& n) const;
     DateTime get_arrive_time(int idx, const Date& start_date) const;
     DateTime get_leave_time(int idx, const Date& start_date) const;
     int get_price(int from, int to) const;
