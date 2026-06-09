@@ -15,20 +15,24 @@ bool UserManager::is_logged(const std::string &u) const {
 
 int UserManager::add_user(const std::string &c, const std::string &u, const std::string &p, const std::string &n, const std::string &m, const std::string &g) {
     UserKey key(u);
-    int pos;
+    int pos = -1;
     if (user_index.empty()) {
         User first(u,p,n,m,10);
         pos = user_data.write(first);
         user_index.insert(key,pos);
         return 0;
     }
-    if (!is_logged(c)) {
-        return -1;
-    }
     if (user_index.find(key,pos)) {
         return -1;
     }
-    int cur_p = logged_users.at(c);
+    if (!is_logged(c)) {
+        return -1;
+    }
+    auto it = logged_users.find(c);
+    if (it == logged_users.end()) {
+        return -1;
+    }
+    int cur_p = it->second;
     int new_p = std::stoi(g);
     if (cur_p <= new_p) {
         return -1;
@@ -53,7 +57,7 @@ int UserManager::login(const std::string &u, const std::string &p) {
     if (std::strcmp(user.password, p.c_str()) != 0) {
         return -1;
     }
-    logged_users.at(u) = user.privilege;
+    logged_users[u] = user.privilege;
     return 0;
 }
 
@@ -76,7 +80,11 @@ int UserManager::query_profile(const std::string &c, const std::string &u) {
     }
     User user;
     user_data.read(user, pos);
-    int cur_p = logged_users.at(c);
+    auto it = logged_users.find(c);
+    if (it == logged_users.end()) {
+        return -1;
+    }
+    int cur_p = it->second;
     if (c != u && cur_p <= user.privilege) {
         return -1;
     }
@@ -95,7 +103,11 @@ int UserManager::modify_profile(const std::string &c, const std::string &u, cons
     }
     User user;
     user_data.read(user,pos);
-    int cur_p = logged_users.at(c);
+    auto it = logged_users.find(c);
+    if (it == logged_users.end()) {
+        return -1;
+    }
+    int cur_p = it->second;
     if (c != u && cur_p <= user.privilege) {
         return -1;
     }
@@ -106,13 +118,20 @@ int UserManager::modify_profile(const std::string &c, const std::string &u, cons
         }
         user.privilege = new_p;
         if (is_logged(u)) {
-            logged_users.at(u) = new_p;
+            logged_users[u] = new_p;
         }
     }
     if (!p.empty()) {
         std::strncpy(user.password, p.c_str(), 30);
+        user.password[30] = '\0';
+    }
+    if (!n.empty()) {
         std::strncpy(user.name, n.c_str(), 15);
+        user.name[15] = '\0';
+    }
+    if (!m.empty()) {
         std::strncpy(user.mailAddr, m.c_str(), 30);
+        user.mailAddr[30] = '\0';
     }
     user_data.update(user,pos);
     std::cout << user.username << ' ' << user.name << ' ' << user.mailAddr << ' ' << user.privilege << '\n';
@@ -123,6 +142,7 @@ void UserManager::clean() {
     user_index.clear();
     logged_users.clear();
     user_data.close();
+    std::remove("user_index");
     std::remove("user_data");
     user_data.initialise();
 }

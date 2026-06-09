@@ -1,7 +1,7 @@
 CMakeFiles/code.dir/src/DateTime.cpp.o: \
- /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem/Ticket-System-2026/src/DateTime.cpp \
+ /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/src/DateTime.cpp \
  /usr/include/stdc-predef.h \
- /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem/Ticket-System-2026/src/../include/DateTime.h \
+ /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/src/../include/DateTime.h \
  /usr/include/c++/13/cstring \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \

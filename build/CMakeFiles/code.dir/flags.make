@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem/Ticket-System-2026/include
+CXX_INCLUDES = -I/mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/include
 
 CXX_FLAGS = -std=gnu++17
 

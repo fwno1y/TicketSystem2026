@@ -24,6 +24,8 @@ private:
         Node() {
             for (int i = 0; i <= M; ++i) {
                 children[i] = -1;
+                keys[i] = Key();
+                values[i] = Value();
             }
         }
     };

@@ -12,7 +12,7 @@
 
 
 template<typename Key, typename Value, int M>
-BPlusTree<Key, Value, M>::BPlusTree(const std::string& fn) : file_name(fn), tree(fn) {
+BPlusTree<Key, Value, M>::BPlusTree(const std::string& fn) : file_name(fn), tree(fn), root(0) {
     tree.initialise();
     tree.get_info(root, 1);
 }
@@ -366,7 +366,10 @@ bool BPlusTree<Key, Value, M>::remove(const Key& key) {
 
 template<typename Key, typename Value, int M>
 bool BPlusTree<Key, Value, M>::find(const Key& key, Value& result) {
-    if (root == 0) return false;
+    if (root == 0) {
+        result = Value();
+        return false;
+    }
 
     int cur = root;
     Node node;

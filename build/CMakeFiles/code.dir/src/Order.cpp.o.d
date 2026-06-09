@@ -1,7 +1,7 @@
 CMakeFiles/code.dir/src/Order.cpp.o: \
- /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem/Ticket-System-2026/src/Order.cpp \
+ /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/src/Order.cpp \
  /usr/include/stdc-predef.h \
- /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem/Ticket-System-2026/src/../include/Order.h \
+ /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/src/../include/Order.h \
  /usr/include/c++/13/iostream /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -151,5 +151,5 @@ CMakeFiles/code.dir/src/Order.cpp.o: \
  /usr/include/c++/13/bits/basic_ios.tcc \
  /usr/include/c++/13/bits/ostream.tcc /usr/include/c++/13/istream \
  /usr/include/c++/13/bits/istream.tcc \
- /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem/Ticket-System-2026/src/../include/DateTime.h \
+ /mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/src/../include/DateTime.h \
  /usr/include/c++/13/cstring /usr/include/string.h /usr/include/strings.h
