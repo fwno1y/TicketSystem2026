@@ -9,3 +9,4 @@ include_directories(BEFORE ${CMAKE_SOURCE_DIR}/include)
 
 file(GLOB SOURCES "src/*.cpp")
 add_executable(code ${SOURCES})
+

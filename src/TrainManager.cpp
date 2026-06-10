@@ -34,8 +34,8 @@ int TrainManager::add_train(const std::string &i, const std::string &n, const st
     }
     sjtu::vector<std::string> prices_vec;
     parser.split(p, '|', prices_vec);
-    train.prices[0] = 0;
-    for (int j = 0; j < prices_vec.size(); ++j) {
+    memset(train.prices, 0, sizeof(train.prices));
+    for (int j = 0; j < prices_vec.size() && j < train.stationNum - 1; ++j) {
         train.prices[j + 1] = train.prices[j] + std::stoi(prices_vec[j]);
     }
     sjtu::vector<std::string> travel_vec;
@@ -160,9 +160,7 @@ int TrainManager::query_train(const std::string &i, const std::string &d) {
         else {
             std::cout << tl.tickets[j];
         }
-        if (j < train.stationNum - 1) {
-            std::cout << "\n";
-        }
+        std::cout << "\n";
     }
     return 0;
 }
@@ -476,6 +474,9 @@ int TrainManager::try_buy(const std::string &id, const Date &date, int from, int
     }
     TicketLeft tl;
     ticket_data.read(tl,ticket_pos);
+    //fix : 先赋值，使得候补订单获取车次信息
+    train_out = train;
+    start_date_out = start_date;
     int left_tickets = tl.min_tickets(from, to);
     if (left_tickets < num) {
         return 0;
@@ -483,8 +484,6 @@ int TrainManager::try_buy(const std::string &id, const Date &date, int from, int
     //扣票
     tl.update(from, to, -num);
     ticket_data.update(tl, ticket_pos);
-    train_out = train;
-    start_date_out = start_date;
     return train.get_price(from, to);
 }
 

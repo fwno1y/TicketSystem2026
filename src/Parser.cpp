@@ -33,13 +33,19 @@ bool CommandParser::parse(const std::string &line, Command &cmd) {
     cmd = Command();
     sjtu::vector<std::string> tokens;
     split(line,' ', tokens);
+    if (tokens.size() < 2) {
+        return false;
+    }
     const std::string& str = tokens[0];
     if (str.size() < 3 || str[0] != '[' || str[str.size() - 1] != ']') {
         return false;
     }
     cmd.timestamp = 0;
-    for (int i = 1; i < str.size(); ++i) {
+    for (int i = 1; i < str.size() - 1; ++i) {
         cmd.timestamp = cmd.timestamp * 10 + (str[i] - '0');
+    }
+    if (tokens.size() < 2) {
+        return false;
     }
     cmd.cmd = tokens[1];
     for (int i = 2; i < tokens.size() - 1; i += 2) {

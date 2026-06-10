@@ -1,0 +1,3 @@
+/mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/cmake-build-debug/CMakeFiles/code.dir
+/mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/cmake-build-debug/CMakeFiles/edit_cache.dir
+/mnt/c/Users/36433/Desktop/课程作业/大一下/数据结构/TicketSystem2026/cmake-build-debug/CMakeFiles/rebuild_cache.dir

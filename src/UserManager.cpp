@@ -142,8 +142,8 @@ void UserManager::clean() {
     user_index.clear();
     logged_users.clear();
     user_data.close();
-    std::remove("user_index");
-    std::remove("user_data");
+    std::ofstream tmp("user_data", std::ios::binary | std::ios::trunc);
+    tmp.close();
     user_data.initialise();
 }
 

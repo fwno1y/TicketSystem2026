@@ -27,7 +27,7 @@ int main() {
         if (!parser.parse(line, cmd)) {
             continue;
         }
-        std::cout << "[" << cmd.timestamp << "]";
+        std::cout << "[" << cmd.timestamp << "] ";
         if (cmd.cmd == "add_user") {
             std::cout << user_manager.add_user(cmd.get('c'), cmd.get('u'),cmd.get('p'), cmd.get('n'), cmd.get('m'), cmd.get('g')) << '\n';
         }
@@ -38,10 +38,16 @@ int main() {
             std::cout << user_manager.logout(cmd.get('u')) << '\n';
         }
         else if (cmd.cmd == "query_profile") {
-            user_manager.query_profile(cmd.get('c'), cmd.get('u'));
+            int res = user_manager.query_profile(cmd.get('c'), cmd.get('u'));
+            if (res == -1) {
+                std::cout << "-1\n";
+            }
         }
         else if (cmd.cmd == "modify_profile") {
-            user_manager.modify_profile(cmd.get('c'), cmd.get('u'), cmd.get('p'), cmd.get('n'), cmd.get('m'), cmd.get('g'));
+            int res = user_manager.modify_profile(cmd.get('c'), cmd.get('u'), cmd.get('p'), cmd.get('n'), cmd.get('m'), cmd.get('g'));
+            if (res == -1) {
+                std::cout << "-1\n";
+            }
         }
         else if (cmd.cmd == "add_train") {
             std::cout << train_manager.add_train(cmd.get('i'), cmd.get('n'), cmd.get('m'), cmd.get('s'),cmd.get('p'), cmd.get('x'), cmd.get('t'), cmd.get('o'),cmd.get('d'), cmd.get('y')) << '\n';
@@ -53,7 +59,10 @@ int main() {
             std::cout << train_manager.release_train(cmd.get('i')) << '\n';
         }
         else if (cmd.cmd == "query_train") {
-            train_manager.query_train(cmd.get('i'), cmd.get('d'));
+            int res = train_manager.query_train(cmd.get('i'), cmd.get('d'));
+            if (res == -1) {
+                std::cout << "-1\n";
+            }
         }
         else if (cmd.cmd == "query_ticket") {
             bool p_time = false;
@@ -61,7 +70,7 @@ int main() {
                 p_time = true;
             }
             sjtu::vector<Ticket> res;
-            std::cout << train_manager.query_ticket(cmd.get('s'),cmd.get('t'), cmd.get('d'), p_time, res);
+            std::cout << train_manager.query_ticket(cmd.get('s'),cmd.get('t'), cmd.get('d'), p_time, res) << '\n';
             for (int i = 0; i < res.size(); ++i) {
                 const Ticket& ticket = res[i];
                 std::cout << ticket.trainID << " " << ticket.from_station << " " << ticket.leave_time.to_string() << " -> " << ticket.to_station << " " << ticket.arrive_time.to_string() << " " << ticket.price << " " << ticket.seat << '\n';

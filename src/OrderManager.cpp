@@ -74,7 +74,7 @@ int OrderManager::buy_ticket(const std::string &u, const std::string &i, const s
         order.start_date = start_date;
         order.user_date = user_date;
         std::strncpy(order.from_station, f.c_str(), 30);
-        std::strncpy(order.to_station, i.c_str(), 30);
+        std::strncpy(order.to_station, t.c_str(), 30); //手误
         order.from_idx = from_idx;
         order.to_idx = to_idx;
         order.leave_time = train.get_leave_time(from_idx, start_date);
@@ -106,9 +106,7 @@ int OrderManager::query_order(const std::string &u, sjtu::vector<Order> &res) {
         Order order;
         order_data.read(order, positions[i]);
         order.print();
-        if (i > 0) {
-            std::cout << "\n";
-        }
+        std::cout << "\n";
     }
     return 0;
 }
