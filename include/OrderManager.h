@@ -10,9 +10,9 @@
 
 class OrderManager {
 private:
-    BPlusTree<OrderKey, int> order_index;
+    BPlusTree<OrderKey, int, 50> order_index;
     MemoryRiver<Order, 3> order_data;
-    BPlusTree<PendingOrderKey, PendingOrder> pending_index;
+    BPlusTree<PendingOrderKey, PendingOrder, 50> pending_index;
     int order_cnt;
 
 

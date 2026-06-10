@@ -1,6 +1,7 @@
 #include "../include/TrainManager.h"
 #include"../include/Parser.h"
 #include "cstring"
+#include "../include/Map.h"
 
 TrainManager::TrainManager() : train_index("train_index"), train_date_index("train_date_index"), train_station_index("train_station_index"), train_data("train_data"), ticket_data("ticket_data") {
     train_data.initialise();
@@ -257,170 +258,194 @@ int TrainManager::query_ticket(const std::string &s, const std::string &t, const
 bool TrainManager::query_transfer(const std::string &s, const std::string &t, const std::string &d, bool p, Ticket &t1, Ticket &t2) {
     Date user_date;
     user_date.parse(d);
-    StationKey low_key(s,"");
-    StationKey high_key(s,"\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f");
+    // 第一步：缓存所有从S出发的有效车次
+    sjtu::map<std::string, sjtu::vector<int>> transfer_map;
+    StationKey low_key_s(s, "");
+    StationKey high_key_s(s, "\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f");
     sjtu::vector<Station> train1_vec;
-    train_station_index.find_range(low_key, high_key, train1_vec);
-    bool found = false;
-    Ticket best_t1, best_t2;
+    train_station_index.find_range(low_key_s, high_key_s, train1_vec);
+
+    struct Train1Info {
+        Train train;
+        int s_idx;
+        Date start_date;
+        TicketLeft tl;
+    };
+    sjtu::vector<Train1Info> valid_train1;
+
     for (int i = 0; i < train1_vec.size(); ++i) {
         const Station& st1 = train1_vec[i];
         TrainKey tkey1(st1.trainID);
         int pos1;
-        if (!train_index.find(tkey1,pos1)) {
-            continue;
-        }
+        if (!train_index.find(tkey1, pos1)) continue;
+
         Train train1;
-        train_data.read(train1,pos1);
-        if (!train1.released) {
-            continue;
-        }
-        int from1_idx = st1.station_idx;
+        train_data.read(train1, pos1);
+        if (!train1.released) continue;
+
         int start_minutes_1 = train1.startTime.to_minutes();
-        int day_offset_1 = (start_minutes_1 + train1.leaveTimes[from1_idx]) / 1440;
-        int start_day_1 = user_date.to_days() - day_offset_1;
-        Date start_date_1 = Date::from_days(start_day_1);
-        if (start_date_1 < train1.saleDateStart || train1.saleDateEnd < start_date_1) {
-            continue;
-        }
+        int day_offset_1 = (start_minutes_1 + train1.leaveTimes[st1.station_idx]) / 1440;
+        Date start_date_1 = Date::from_days(user_date.to_days() - day_offset_1);
+
+        if (start_date_1 < train1.saleDateStart || train1.saleDateEnd < start_date_1) continue;
+
         DayKey dkey1(train1.trainID, start_date_1);
         int tl_pos1;
-        if (!train_date_index.find(dkey1,tl_pos1)) {
-            continue;
-        }
+        if (!train_date_index.find(dkey1, tl_pos1)) continue;
+
         TicketLeft tl1;
-        ticket_data.read(tl1,tl_pos1);
-        //中转站遍历
-        for (int j = from1_idx + 1; j < train1.stationNum; ++j) {
-            std::string transfer = train1.stations[j];
-            if (transfer == t) {
-                continue;
+        ticket_data.read(tl1, tl_pos1);
+
+        Train1Info info;
+        info.train = train1;
+        info.s_idx = st1.station_idx;
+        info.start_date = start_date_1;
+        info.tl = tl1;
+
+        int idx = valid_train1.size();
+        valid_train1.push_back(info);
+
+        for (int j = st1.station_idx + 1; j < train1.stationNum; ++j) {
+            if (std::strcmp(train1.stations[j], t.c_str()) != 0) {
+                std::string transfer_name(train1.stations[j]);
+                transfer_map[transfer_name].push_back(idx);
             }
-            DateTime transfer_time = train1.get_arrive_time(j, start_date_1);
-            StationKey low(transfer, "");
-            StationKey high(transfer,"\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f");
-            sjtu::vector<Station> train2_vec;
-            train_station_index.find_range(low,high,train2_vec);
-            for (int k = 0; k < train2_vec.size(); ++k) {
-                const Station& st2 = train2_vec[k];
-                if (std::strcmp(st2.trainID, train1.trainID) == 0) {
-                    continue;
+        }
+    }
+
+    if (valid_train1.empty()) return false;
+
+    // 第二步：缓存所有到T的车次
+    StationKey low_key_t(t, "");
+    StationKey high_key_t(t, "\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f");
+    sjtu::vector<Station> train2_vec;
+    train_station_index.find_range(low_key_t, high_key_t, train2_vec);
+
+    struct Train2Info {
+        Train train;
+        int t_idx;
+    };
+    sjtu::vector<Train2Info> valid_train2;
+
+    for (int k = 0; k < train2_vec.size(); ++k) {
+        const Station& st2 = train2_vec[k];
+        TrainKey tkey2(st2.trainID);
+        int pos2;
+        if (!train_index.find(tkey2, pos2)) continue;
+
+        Train train2;
+        train_data.read(train2, pos2);  // ← 只读一次！
+        if (!train2.released) continue;
+
+        Train2Info info2;
+        info2.train = train2;
+        info2.t_idx = st2.station_idx;
+        valid_train2.push_back(info2);
+    }
+
+    bool found = false;
+    Ticket best_t1, best_t2;
+
+    // 第三步：遍历train2缓存
+    for (int k = 0; k < valid_train2.size(); ++k) {
+        const Train2Info& info2 = valid_train2[k];
+        const Train& train2 = info2.train;
+        int to2_idx = info2.t_idx;
+
+        for (int ti = 0; ti < to2_idx; ++ti) {
+            std::string transfer_name(train2.stations[ti]);
+            auto it = transfer_map.find(transfer_name);
+            if (it == transfer_map.end()) continue;
+
+            const sjtu::vector<int>& train1_indices = it->second;
+
+            for (int idx_i = 0; idx_i < train1_indices.size(); ++idx_i) {
+                int i = train1_indices[idx_i];
+                const Train1Info& info1 = valid_train1[i];
+
+                if (std::strcmp(info1.train.trainID, train2.trainID) == 0) continue;
+
+                int j = -1;
+                for (int jj = info1.s_idx + 1; jj < info1.train.stationNum; ++jj) {
+                    if (std::strcmp(info1.train.stations[jj], transfer_name.c_str()) == 0) {
+                        j = jj;
+                        break;
+                    }
                 }
-                TrainKey tkey2(st2.trainID);
-                int pos2;
-                if (!train_index.find(tkey2,pos2)) {
-                    continue;
-                }
-                Train train2;
-                train_data.read(train2,pos2);
-                if (!train2.released) {
-                    continue;
-                }
-                int transfer_idx = st2.station_idx;
-                int to2_idx = train2.find_station(t.c_str());
-                if (to2_idx == -1 || transfer_idx >= to2_idx) {
-                    continue;
-                }
+                if (j == -1) continue;
+
+                DateTime transfer_time = info1.train.get_arrive_time(j, info1.start_date);
+
                 int start_minutes_2 = train2.startTime.to_minutes();
-                int target_min = transfer_time.to_minutes() - start_minutes_2 - train2.leaveTimes[transfer_idx];
+                int target_min = transfer_time.to_minutes() - start_minutes_2 - train2.leaveTimes[ti];
                 int start_day_2 = target_min / 1440;
-                if (target_min % 1440 > 0) {
-                    start_day_2++;
-                }
+                if (target_min % 1440 > 0) start_day_2++;
+
                 Date start_date_2 = Date::from_days(start_day_2);
-                if (start_date_2 < train2.saleDateStart) {
-                    start_date_2 = train2.saleDateStart;
-                }
-                if (train2.saleDateEnd < start_date_2) {
-                    continue;
-                }
+                if (start_date_2 < train2.saleDateStart) start_date_2 = train2.saleDateStart;
+                if (train2.saleDateEnd < start_date_2) continue;
+
                 DayKey dkey2(train2.trainID, start_date_2);
                 int tl_pos2;
-                if (!train_date_index.find(dkey2,tl_pos2)) {
-                    continue;
-                }
+                if (!train_date_index.find(dkey2, tl_pos2)) continue;
+
                 TicketLeft tl2;
                 ticket_data.read(tl2, tl_pos2);
-                Ticket ti1,ti2;
-                memset(&ti1, 0, sizeof(Ticket));
-                memset(&ti2, 0, sizeof(Ticket));
-                std::strncpy(ti1.trainID, train1.trainID, 20);
+
+                Ticket ti1, ti2;
+                std::memset(&ti1, 0, sizeof(Ticket));
+                std::memset(&ti2, 0, sizeof(Ticket));
+
+                std::strncpy(ti1.trainID, info1.train.trainID, 20);
                 std::strncpy(ti1.from_station, s.c_str(), 30);
-                std::strncpy(ti1.to_station, transfer.c_str(), 30);
-                ti1.leave_time = train1.get_leave_time(from1_idx, start_date_1);
+                std::strncpy(ti1.to_station, transfer_name.c_str(), 30);
+                ti1.leave_time = info1.train.get_leave_time(info1.s_idx, info1.start_date);
                 ti1.arrive_time = transfer_time;
-                ti1.price = train1.get_price(from1_idx, j);
-                ti1.seat = tl1.min_tickets(from1_idx,j);
+                ti1.price = info1.train.get_price(info1.s_idx, j);
+                ti1.seat = info1.tl.min_tickets(info1.s_idx, j);
                 ti1.duration = ti1.arrive_time.diff(ti1.leave_time);
+
                 std::strncpy(ti2.trainID, train2.trainID, 20);
-                std::strncpy(ti2.from_station, transfer.c_str(), 30);
+                std::strncpy(ti2.from_station, transfer_name.c_str(), 30);
                 std::strncpy(ti2.to_station, t.c_str(), 30);
-                ti2.leave_time = train2.get_leave_time(transfer_idx, start_date_2);
+                ti2.leave_time = train2.get_leave_time(ti, start_date_2);
                 ti2.arrive_time = train2.get_arrive_time(to2_idx, start_date_2);
-                ti2.price = train2.get_price(transfer_idx, to2_idx);
-                ti2.seat = tl2.min_tickets(transfer_idx, to2_idx);
+                ti2.price = train2.get_price(ti, to2_idx);
+                ti2.seat = tl2.min_tickets(ti, to2_idx);
                 ti2.duration = ti2.arrive_time.diff(ti2.leave_time);
 
                 bool better = false;
                 if (!found) {
                     better = true;
-                }
-                else {
+                } else {
                     int total_time = ti2.arrive_time.diff(ti1.leave_time);
                     int best_total_time = best_t2.arrive_time.diff(best_t1.leave_time);
                     int total_cost = ti1.price + ti2.price;
                     int best_total_cost = best_t1.price + best_t2.price;
+
                     if (p) {
-                        if (total_time != best_total_time) {
-                            if (total_time < best_total_time) {
-                                better = true;
+                        if (total_time < best_total_time) better = true;
+                        else if (total_time == best_total_time) {
+                            if (total_cost < best_total_cost) better = true;
+                            else if (total_cost == best_total_cost) {
+                                int cmp = std::strcmp(ti1.trainID, best_t1.trainID);
+                                if (cmp < 0) better = true;
+                                else if (cmp == 0 && std::strcmp(ti2.trainID, best_t2.trainID) < 0) better = true;
                             }
                         }
-                        else if (total_cost != best_total_cost) {
-                            if (total_cost < best_total_cost) {
-                                better = true;
+                    } else {
+                        if (total_cost < best_total_cost) better = true;
+                        else if (total_cost == best_total_cost) {
+                            if (total_time < best_total_time) better = true;
+                            else if (total_time == best_total_time) {
+                                int cmp = std::strcmp(ti1.trainID, best_t1.trainID);
+                                if (cmp < 0) better = true;
+                                else if (cmp == 0 && std::strcmp(ti2.trainID, best_t2.trainID) < 0) better = true;
                             }
-                        }
-                        else {
-                            int cmp = std::strcmp(ti1.trainID, best_t1.trainID);
-                            if (cmp != 0) {
-                                if (cmp < 0) {
-                                    better = true;
-                                }
-                            }
-                            else {
-                                if (std::strcmp(ti2.trainID, best_t2.trainID) < 0) {
-                                    better = true;
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        if (total_cost != best_total_cost) {
-                            if (total_cost < best_total_cost) {
-                                better = true;
-                            }
-                        }
-                        else if (total_time != best_total_time) {
-                            if (total_time < best_total_time) {
-                                better = true;
-                            }
-                        }
-                        else {
-                            int cmp = std::strcmp(ti1.trainID, best_t1.trainID);
-                            if (cmp != 0) {
-                                if (cmp < 0) {
-                                    better = true;
-                                }
-                            }
-                            else {
-                                if (std::strcmp(ti2.trainID, best_t2.trainID) < 0) {
-                                    better = true;
-                                }
-                            }                                                       
                         }
                     }
                 }
+
                 if (better) {
                     best_t1 = ti1;
                     best_t2 = ti2;
@@ -429,6 +454,7 @@ bool TrainManager::query_transfer(const std::string &s, const std::string &t, co
             }
         }
     }
+
     if (found) {
         t1 = best_t1;
         t2 = best_t2;

@@ -435,10 +435,10 @@ bool BPlusTree<Key, Value, M>::empty() {
     return root == 0;
 }
 
-template class BPlusTree<OrderKey, int, 300>;
-template class BPlusTree<PendingOrderKey, PendingOrder, 300>;
-template class BPlusTree<TrainKey, int, 300>;
-template class BPlusTree<DayKey, int, 300>;
-template class BPlusTree<StationKey, Station, 300>;
-template class BPlusTree<UserKey, int, 300>;
+template class BPlusTree<OrderKey, int, 50>;
+template class BPlusTree<PendingOrderKey, PendingOrder, 50>;
+template class BPlusTree<TrainKey, int, 50>;
+template class BPlusTree<DayKey, int, 50>;
+template class BPlusTree<StationKey, Station, 50>;
+template class BPlusTree<UserKey, int, 50>;
 #endif //TICKETSYSTEM_BPLUSTREE_HPP

@@ -11,9 +11,9 @@
 
 class TrainManager {
 private:
-    BPlusTree<TrainKey, int> train_index;
-    BPlusTree<DayKey, int> train_date_index;
-    BPlusTree<StationKey, Station> train_station_index;
+    BPlusTree<TrainKey, int, 50> train_index;
+    BPlusTree<DayKey, int, 50> train_date_index;
+    BPlusTree<StationKey, Station, 50> train_station_index;
     MemoryRiver<Train> train_data;
     MemoryRiver<TicketLeft> ticket_data;
 
