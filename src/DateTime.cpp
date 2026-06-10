@@ -29,10 +29,17 @@ std::string Date::to_string() const {
 
 int Date::to_days() const {
     int days = 0;
-    for (int m = 6; m < month; ++m) {
-        days += DAY_IN_MONTH[m];
+    if (month >= 6) {
+        for (int m = 6; m < month; ++m) {
+            days += DAY_IN_MONTH[m];
+        }
+        days += day - 1;
+    } else {
+        for (int m = month; m < 6; ++m) {
+            days -= DAY_IN_MONTH[m];
+        }
+        days += day - 1;
     }
-    days += day - 1;
     return days;
 }
 

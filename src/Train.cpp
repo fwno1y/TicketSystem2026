@@ -144,12 +144,9 @@ bool Station::operator==(const Station &other) const {
 }
 
 TicketLeft::TicketLeft(int seat, int station) {
+    memset(tickets, 0, sizeof(tickets));
     for (int i = 0; i < station - 1; ++i) {
         tickets[i] = seat;
-    }
-    //确保其余部分清零
-    for (int i = station - 1; i < MAX_STATION; ++i) {
-        tickets[i] = 0;
     }
 }
 

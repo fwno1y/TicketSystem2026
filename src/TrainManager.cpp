@@ -349,8 +349,8 @@ bool TrainManager::query_transfer(const std::string &s, const std::string &t, co
                 std::strncpy(ti1.to_station, transfer.c_str(), 30);
                 ti1.leave_time = train1.get_leave_time(from1_idx, start_date_1);
                 ti1.arrive_time = transfer_time;
-                ti1.price = train1.get_price(from1_idx, transfer_idx);
-                ti1.seat = tl1.min_tickets(from1_idx,transfer_idx);
+                ti1.price = train1.get_price(from1_idx, j);
+                ti1.seat = tl1.min_tickets(from1_idx,j);
                 ti1.duration = ti1.arrive_time.diff(ti1.leave_time);
                 std::strncpy(ti2.trainID, train2.trainID, 20);
                 std::strncpy(ti2.from_station, transfer.c_str(), 30);
