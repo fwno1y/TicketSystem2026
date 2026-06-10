@@ -12,7 +12,7 @@ private:
     BPlusTree<UserKey, int> user_index;
     MemoryRiver<User> user_data;
     sjtu::map<std::string, int> logged_users;
-
+    sjtu::map<std::string, User> user_cache;
 
 
 public:

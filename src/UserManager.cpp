@@ -40,6 +40,7 @@ int UserManager::add_user(const std::string &c, const std::string &u, const std:
     User new_user(u,p,n,m,new_p);
     pos = user_data.write(new_user);
     user_index.insert(key,pos);
+    user_cache.insert({u, new_user});
     return 0;
 }
 
@@ -73,19 +74,22 @@ int UserManager::query_profile(const std::string &c, const std::string &u) {
     if (!is_logged(c)) {
         return -1;
     }
-    UserKey key(u);
-    int pos;
-    if (!user_index.find(key,pos)) {
-        return -1;
+    auto cache_it = user_cache.find(u);
+    if (cache_it == user_cache.end()) {
+        UserKey key(u);
+        int pos;
+        if (!user_index.find(key, pos)) return -1;
+        User user;
+        user_data.read(user, pos);
+        user_cache.insert({u, user});
+        cache_it = user_cache.find(u);
     }
-    User user;
-    user_data.read(user, pos);
+    const User& user = cache_it->second;
     auto it = logged_users.find(c);
     if (it == logged_users.end()) {
         return -1;
     }
-    int cur_p = it->second;
-    if (c != u && cur_p <= user.privilege) {
+    if (c != u && it->second <= user.privilege) {
         return -1;
     }
     std::cout << user.username << ' ' << user.name << ' ' << user.mailAddr << ' ' << user.privilege << '\n';
@@ -134,6 +138,12 @@ int UserManager::modify_profile(const std::string &c, const std::string &u, cons
         user.mailAddr[30] = '\0';
     }
     user_data.update(user,pos);
+    auto cache_it = user_cache.find(u);
+    if (cache_it != user_cache.end()) {
+        cache_it->second = user;
+    } else {
+        user_cache.insert({u, user});
+    }
     std::cout << user.username << ' ' << user.name << ' ' << user.mailAddr << ' ' << user.privilege << '\n';
     return 0;
 }
@@ -144,6 +154,7 @@ void UserManager::clean() {
     user_data.close();
     std::ofstream tmp("user_data", std::ios::binary | std::ios::trunc);
     tmp.close();
+    user_cache.clear();
     user_data.initialise();
 }
 
