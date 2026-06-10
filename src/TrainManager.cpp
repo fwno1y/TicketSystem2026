@@ -201,53 +201,69 @@ void TrainManager::sort_tickets(sjtu::vector<Ticket> &res, int low, int high, bo
 int TrainManager::query_ticket(const std::string &s, const std::string &t, const std::string &d, bool p, sjtu::vector<Ticket> &res) {
     Date user_date;
     user_date.parse(d);
-    StationKey low_key(s,"");
-    StationKey high_key(s, "\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f");
-    sjtu::vector<Station> station_vec;
-    train_station_index.find_range(low_key, high_key, station_vec);
-    for (int k = 0; k < station_vec.size(); ++k) {
-        const Station& st = station_vec[k];
-        TrainKey tkey(st.trainID);
-        int train_pos;
-        if (!train_index.find(tkey, train_pos)) {
-            continue;
+    // 获取所有经过起点S的车次关系（按trainID升序返回）
+    StationKey low_key_s(s, "");
+    StationKey high_key_s(s, "\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f");
+    sjtu::vector<Station> station_vec_S;
+    train_station_index.find_range(low_key_s, high_key_s, station_vec_S);
+    // 获取所有经过终点T的车次关系（按trainID升序返回）
+    StationKey low_key_t(t, "");
+    StationKey high_key_t(t, "\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f\x7f");
+    sjtu::vector<Station> station_vec_T;
+    train_station_index.find_range(low_key_t, high_key_t, station_vec_T);
+    int i = 0, j = 0;
+    int size_s = station_vec_S.size();
+    int size_t = station_vec_T.size();
+    // 双指针进行交集寻找
+    while (i < size_s && j < size_t) {
+        int cmp = std::strcmp(station_vec_S[i].trainID, station_vec_T[j].trainID);
+        if (cmp == 0) {
+            int from_idx = station_vec_S[i].station_idx;
+            int to_idx = station_vec_T[j].station_idx;
+            // 确保起点在终点前面
+            if (from_idx < to_idx) {
+                // 只有完全匹配两个站点的车次，才真正进行磁盘读取
+                TrainKey tkey(station_vec_S[i].trainID);
+                int train_pos;
+                if (train_index.find(tkey, train_pos)) {
+                    Train train;
+                    train_data.read(train, train_pos);
+                    if (train.released) {
+                        // 计算该车在这趟行程里的实际始发日期
+                        int start_minutes = train.startTime.to_minutes();
+                        int day_offset = (start_minutes + train.leaveTimes[from_idx]) / 1440;
+                        int start_day = user_date.to_days() - day_offset;
+                        Date start_date = Date::from_days(start_day);
+                        if (start_date >= train.saleDateStart && start_date <= train.saleDateEnd) {
+                            DayKey dkey(train.trainID, start_date);
+                            int t_pos;
+                            if (train_date_index.find(dkey, t_pos)) {
+                                TicketLeft tl;
+                                ticket_data.read(tl, t_pos);
+                                Ticket ticket;
+                                std::memset(&ticket, 0, sizeof(Ticket));
+                                std::strncpy(ticket.trainID, train.trainID, 20);
+                                std::strncpy(ticket.from_station, s.c_str(), 30);
+                                std::strncpy(ticket.to_station, t.c_str(), 30);
+                                ticket.leave_time = train.get_leave_time(from_idx, start_date);
+                                ticket.arrive_time = train.get_arrive_time(to_idx, start_date);
+                                ticket.price = train.get_price(from_idx, to_idx);
+                                ticket.seat = tl.min_tickets(from_idx, to_idx);
+                                ticket.duration = ticket.arrive_time.diff(ticket.leave_time);
+
+                                res.push_back(ticket);
+                            }
+                        }
+                    }
+                }
+            }
+            i++;
+            j++;
+        } else if (cmp < 0) {
+            i++;
+        } else {
+            j++;
         }
-        Train train;
-        train_data.read(train, train_pos);
-        if (!train.released) {
-            continue;
-        }
-        int from_idx = st.station_idx;
-        int to_idx = train.find_station(t.c_str());
-        if (to_idx == -1 || from_idx >= to_idx) {
-            continue;
-        }
-        //计算始发日期
-        int start_minutes = train.startTime.to_minutes();
-        int day_offset = (start_minutes + train.leaveTimes[from_idx]) / 1440;
-        int start_day = user_date.to_days() - day_offset;
-        Date start_date = Date::from_days(start_day);
-        if (start_date < train.saleDateStart || train.saleDateEnd < start_date) {
-            continue;
-        }
-        DayKey dkey(train.trainID, start_date);
-        int t_pos;
-        if (!train_date_index.find(dkey, t_pos)) {
-            continue;
-        }
-        TicketLeft tl;
-        ticket_data.read(tl,t_pos);
-        Ticket ticket;
-        memset(&ticket, 0, sizeof(ticket));
-        std::strncpy(ticket.trainID, train.trainID, 20);
-        std::strncpy(ticket.from_station, s.c_str(), 30);
-        std::strncpy(ticket.to_station, t.c_str(), 30);
-        ticket.leave_time = train.get_leave_time(from_idx,start_date);
-        ticket.arrive_time = train.get_arrive_time(to_idx,start_date);
-        ticket.price = train.get_price(from_idx,to_idx);
-        ticket.seat = tl.min_tickets(from_idx,to_idx);
-        ticket.duration = ticket.arrive_time.diff(ticket.leave_time);
-        res.push_back(ticket);
     }
     if (!res.empty()) {
         sort_tickets(res, 0, res.size() - 1, p);
