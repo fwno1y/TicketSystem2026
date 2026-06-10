@@ -6,7 +6,7 @@
 #include <cstring>
 #include <iostream>
 
-template<typename Key, typename Value, int M = 100>
+template<typename Key, typename Value, int M = 300>
 class BPlusTree {
 private:
     static const int MIN_SIZE = (M - 1) / 2;

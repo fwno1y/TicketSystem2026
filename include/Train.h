@@ -4,7 +4,7 @@
 #include <iostream>
 #include "DateTime.h"
 
-const int MAX_STATION = 40;
+const int MAX_STATION = 35;
 
 class Train {
 public:

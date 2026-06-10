@@ -459,6 +459,10 @@ int TrainManager::try_buy(const std::string &id, const Date &date, int from, int
     if (from < 0 || to >= train.stationNum || from >= to) {
         return -1;
     }
+    //购买数量不能大于总座位数
+    if (num > train.seatNum) {
+        return -1;
+    }
     int start_minutes = train.startTime.to_minutes();
     int day_offset = (start_minutes + train.leaveTimes[from]) / 1440;
     int start_day = date.to_days() - day_offset;

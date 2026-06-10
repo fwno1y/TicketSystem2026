@@ -27,7 +27,7 @@ int OrderManager::buy_ticket(const std::string &u, const std::string &i, const s
     }
     from_idx = tmp.find_station(f.c_str());
     to_idx = tmp.find_station(t.c_str());
-    if (from_idx == -1 || to_idx == -1 || from_idx >= to_idx) {
+    if (from_idx == -1 || to_idx == -1 || from_idx >= to_idx || from_idx >= tmp.stationNum || to_idx >= tmp.stationNum) {
         return -1;
     }
     Date user_date;
